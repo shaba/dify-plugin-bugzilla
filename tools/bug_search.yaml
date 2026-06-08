@@ -1,0 +1,26 @@
+identity:
+  name: bug_search
+  author: shaba
+  label:
+    en_US: Bugzilla search
+    ru_RU: "Bugzilla: поиск"
+description:
+  human:
+    en_US: Search Bugzilla bugs via quicksearch
+    ru_RU: Поиск багов Bugzilla через quicksearch
+  llm: Search Bugzilla bugs by free-text query (Bugzilla quicksearch syntax). Returns matching bugs with id, status, summary, product/component. Use to find known bugs by keyword, package or component.
+parameters:
+  - name: query
+    type: string
+    required: true
+    label:
+      en_US: Query
+      ru_RU: Запрос
+    human_description:
+      en_US: Quicksearch query (keywords, package, component)
+      ru_RU: Запрос quicksearch (ключевые слова, пакет, компонент)
+    llm_description: Bugzilla quicksearch query, e.g. a package name, component or keywords
+    form: llm
+extra:
+  python:
+    source: tools/bug_search.py

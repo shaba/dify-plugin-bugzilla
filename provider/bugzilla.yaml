@@ -1,0 +1,40 @@
+identity:
+  author: shaba
+  name: bugzilla
+  label:
+    en_US: Bugzilla
+    ru_RU: Bugzilla
+  description:
+    en_US: Bugzilla — bugs, statuses, comments (read-only)
+    ru_RU: Bugzilla — баги, статусы, комментарии (read-only)
+  icon: icon.svg
+  tags:
+    - productivity
+credentials_for_provider:
+  base_url:
+    type: text-input
+    required: true
+    label:
+      en_US: Bugzilla base URL
+      ru_RU: Базовый URL Bugzilla
+    placeholder:
+      en_US: https://example.com
+    help:
+      en_US: Base URL of the Bugzilla (rest API at /rest)
+      ru_RU: Базовый URL Bugzilla (REST на /rest)
+    url: https://example.com
+  api_key:
+    type: secret-input
+    required: false
+    label:
+      en_US: API key (optional)
+      ru_RU: API-ключ (опц.)
+    help:
+      en_US: Optional Bugzilla API key for access to non-public bugs
+      ru_RU: Опциональный API-ключ Bugzilla для доступа к непубличным багам
+tools:
+  - tools/bug_get.yaml
+  - tools/bug_search.yaml
+extra:
+  python:
+    source: provider/bugzilla.py

@@ -1,0 +1,26 @@
+identity:
+  name: bug_get
+  author: shaba
+  label:
+    en_US: Bugzilla bug details
+    ru_RU: "Bugzilla: детали бага"
+description:
+  human:
+    en_US: Get an Bugzilla bug by id with status, product/component and key comments
+    ru_RU: Получить баг Bugzilla по id со статусом, продуктом/компонентом и комментариями
+  llm: Get details of an Bugzilla bug by its numeric id, including status, resolution, product, component and the first comments. Use when a specific bug number is known.
+parameters:
+  - name: bug_id
+    type: string
+    required: true
+    label:
+      en_US: Bug ID
+      ru_RU: Номер бага
+    human_description:
+      en_US: Numeric bug id (e.g. 40000)
+      ru_RU: Числовой id бага (напр. 40000)
+    llm_description: Numeric Bugzilla bug id, e.g. 40000
+    form: llm
+extra:
+  python:
+    source: tools/bug_get.py

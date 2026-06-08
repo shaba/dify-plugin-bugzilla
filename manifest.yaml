@@ -1,0 +1,35 @@
+version: 0.1.0
+type: plugin
+author: shaba
+name: bugzilla
+repo: https://github.com/shaba/dify-plugin-bugzilla
+label:
+  en_US: Bugzilla
+  ru_RU: Bugzilla
+description:
+  en_US: "Bugzilla: read bugs, statuses and comments from any Bugzilla instance (read-only)."
+  ru_RU: "Bugzilla: чтение багов, статусов и комментариев из любого Bugzilla (read-only)."
+icon: icon.svg
+resource:
+  memory: 268435456
+  permission:
+    model:
+      enabled: false
+    node:
+      enabled: false
+plugins:
+  tools:
+    - provider/bugzilla.yaml
+meta:
+  version: 0.0.1
+  arch:
+    - amd64
+    - arm64
+  runner:
+    language: python
+    version: "3.12"
+    entrypoint: main
+  minimum_dify_version: 1.0.0
+tags:
+  - productivity
+created_at: "2026-06-05T00:00:00Z"
