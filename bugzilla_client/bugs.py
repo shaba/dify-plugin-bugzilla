@@ -3,7 +3,7 @@ from __future__ import annotations
 from typing import Any
 from urllib.parse import quote
 
-from .errors import BugNotFound
+from .errors import BugNotFound, BugzillaAuthError
 from .http import Fetch, api_key_headers, default_fetch
 
 
@@ -33,8 +33,20 @@ def fetch_bug(base_url: str, bug_id: str, *, api_key: str | None = None,
 def fetch_comments(base_url: str, bug_id: str, *, api_key: str | None = None,
                    fetch: Fetch = default_fetch, timeout: int = 30) -> list[dict[str, Any]]:
     payload = fetch(comments_url(base_url, bug_id), timeout, headers=api_key_headers(api_key))
-    bugs = (payload or {}).get("bugs") or {}
-    entry = bugs.get(str(bug_id)) or {}
+    if isinstance(payload, dict) and payload.get("error"):
+        # The comment endpoint failing is almost always a permission rejection (private
+        # bug / restricted comments), not a missing bug. Keep it distinct so the bug_get
+        # tool can still render the bug it already fetched.
+        raise BugzillaAuthError(
+            str(payload.get("message") or f"Comments for bug {bug_id} are not available"))
+    bugs = payload.get("bugs") if isinstance(payload, dict) else None
+    bugs = bugs if isinstance(bugs, dict) else {}
+    entry = bugs.get(str(bug_id))
+    if not isinstance(entry, dict) and len(bugs) == 1:
+        # The response keys the map by the canonical numeric id; if the user-supplied id
+        # form (leading zeros, alias) does not match but exactly one bug came back, use it.
+        entry = next(iter(bugs.values()))
+    entry = entry if isinstance(entry, dict) else {}
     comments = entry.get("comments") or []
     return [c for c in comments if isinstance(c, dict)]
 

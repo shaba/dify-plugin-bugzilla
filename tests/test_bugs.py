@@ -6,7 +6,7 @@ from bugzilla_client.bugs import (
     format_bug,
     status_line,
 )
-from bugzilla_client.errors import BugNotFound
+from bugzilla_client.errors import BugNotFound, BugzillaAuthError
 from bugzilla_client.http import api_key_headers
 
 
@@ -59,6 +59,25 @@ def test_status_line():
 def test_fetch_comments(comments_payload):
     comments = fetch_comments("https://example.com", "40000", fetch=_fetch(comments_payload))
     assert comments and "text" in comments[0]
+
+
+def test_fetch_comments_error_raises_auth():
+    # A permission rejection on the comment endpoint is an auth error, not 'not found',
+    # so the bug_get tool can still render the bug it already fetched.
+    payload = {"error": True, "message": "You are not authorized"}
+    try:
+        fetch_comments("https://example.com", "40000", fetch=_fetch(payload))
+    except BugzillaAuthError:
+        return
+    raise AssertionError("expected BugzillaAuthError for an error response")
+
+
+def test_fetch_comments_fallback_single_entry():
+    # User passes a non-canonical id form; map is keyed by the canonical id but has one
+    # entry, so the comments should still be resolved.
+    payload = {"bugs": {"40000": {"comments": [{"text": "hi", "count": 0}]}}}
+    comments = fetch_comments("https://example.com", "040000", fetch=_fetch(payload))
+    assert comments and comments[0]["text"] == "hi"
 
 
 def test_format_bug_compact(bug_payload, comments_payload):
