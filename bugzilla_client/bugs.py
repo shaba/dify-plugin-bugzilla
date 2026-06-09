@@ -24,7 +24,7 @@ def fetch_bug(base_url: str, bug_id: str, *, api_key: str | None = None,
     payload = fetch(bug_url(base_url, bug_id), timeout, headers=api_key_headers(api_key))
     if isinstance(payload, dict) and payload.get("error"):
         raise BugNotFound(str(payload.get("message") or f"Bug {bug_id} not found"))
-    bugs = (payload or {}).get("bugs") or []
+    bugs = payload.get("bugs") if isinstance(payload, dict) else None
     if not bugs:
         raise BugNotFound(f"Bug {bug_id} not found in Bugzilla")
     return bugs[0]

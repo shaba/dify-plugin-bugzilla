@@ -17,8 +17,8 @@ def search_bugs(base_url: str, query: str, *, limit: int = 20, api_key: str | No
                 fetch: Fetch = default_fetch, timeout: int = 30) -> list[dict[str, Any]]:
     payload = fetch(quicksearch_url(base_url, query, limit=limit), timeout,
                     headers=api_key_headers(api_key))
-    bugs = (payload or {}).get("bugs") or []
-    return [b for b in bugs if isinstance(b, dict)]
+    bugs = payload.get("bugs") if isinstance(payload, dict) else None
+    return [b for b in (bugs or []) if isinstance(b, dict)]
 
 
 def format_search(bugs: list[dict[str, Any]], query: str, *, limit: int = 15) -> str:

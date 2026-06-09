@@ -17,5 +17,15 @@ def api_key_headers(api_key: str | None) -> dict[str, str] | None:
 
 def default_fetch(url: str, timeout: int = 30, *, headers: dict[str, str] | None = None) -> Any:
     response = requests.get(url, timeout=timeout, headers=headers)
+    # Modern Bugzilla (5.x, BMO) signals API errors with a real 4xx status AND a JSON
+    # body {"error": true, "code": .., "message": ..}. Hand that body to the domain layer
+    # so it can raise a friendly BugNotFound/BugzillaSearchError instead of a raw HTTPError.
+    # Only fall back to raise_for_status() when the response is not a usable JSON object.
+    try:
+        payload = response.json()
+    except ValueError:
+        payload = None
+    if isinstance(payload, dict):
+        return payload
     response.raise_for_status()
-    return response.json()
+    return payload
