@@ -10,7 +10,7 @@ import requests
 from bugzilla_client import http
 from bugzilla_client.bugs import fetch_bug
 from bugzilla_client.errors import BugNotFound
-from bugzilla_client.http import default_fetch
+from bugzilla_client.http import BugzillaProbeError, check_bugzilla, default_fetch
 
 
 class FakeResponse:
@@ -74,3 +74,34 @@ def test_default_fetch_raises_on_non_json_4xx(fake_get):
     fake_get(FakeResponse(502, ValueError("no json"), text="<html>bad gateway</html>"))
     with pytest.raises(requests.HTTPError):
         default_fetch("https://example.com/rest/bug/1")
+
+
+def test_check_bugzilla_rejects_bad_api_key(fake_get):
+    responses = iter([
+        FakeResponse(200, {"version": "5.0.4"}),            # /rest/version
+        FakeResponse(401, {"error": True, "message": "invalid api key"}),  # /rest/whoami
+    ])
+    fetch = lambda url, timeout=30, *, headers=None: next(responses).json()  # noqa: E731
+    with pytest.raises(BugzillaProbeError) as excinfo:
+        check_bugzilla("https://example.com", api_key="BAD", fetch=fetch)
+    assert "invalid api key" in str(excinfo.value)
+
+
+def test_check_bugzilla_accepts_valid_api_key():
+    responses = iter([
+        FakeResponse(200, {"version": "5.0.4"}),
+        FakeResponse(200, {"id": 7, "name": "user@example.com"}),
+    ])
+    fetch = lambda url, timeout=30, *, headers=None: next(responses).json()  # noqa: E731
+    assert check_bugzilla("https://example.com", api_key="GOOD", fetch=fetch) == "5.0.4"
+
+
+def test_check_bugzilla_skips_whoami_without_key():
+    calls = []
+
+    def fetch(url, timeout=30, *, headers=None):
+        calls.append(url)
+        return {"version": "5.0.4"}
+
+    assert check_bugzilla("https://example.com", fetch=fetch) == "5.0.4"
+    assert calls == ["https://example.com/rest/version"]  # no whoami probe
