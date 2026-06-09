@@ -8,15 +8,15 @@ from .http import Fetch, api_key_headers, default_fetch
 
 
 def bug_browser_url(base_url: str, bug_id: str) -> str:
-    return f"{base_url.rstrip('/')}/show_bug.cgi?id={quote(str(bug_id))}"
+    return f"{base_url.rstrip('/')}/show_bug.cgi?id={quote(str(bug_id), safe='')}"
 
 
 def bug_url(base_url: str, bug_id: str) -> str:
-    return f"{base_url.rstrip('/')}/rest/bug/{quote(str(bug_id))}"
+    return f"{base_url.rstrip('/')}/rest/bug/{quote(str(bug_id), safe='')}"
 
 
 def comments_url(base_url: str, bug_id: str) -> str:
-    return f"{base_url.rstrip('/')}/rest/bug/{quote(str(bug_id))}/comment"
+    return f"{base_url.rstrip('/')}/rest/bug/{quote(str(bug_id), safe='')}/comment"
 
 
 def fetch_bug(base_url: str, bug_id: str, *, api_key: str | None = None,

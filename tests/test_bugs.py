@@ -27,6 +27,10 @@ def test_bug_urls_never_carry_secret():
     assert "api_key" not in bug_url("https://example.com", "40000")
 
 
+def test_bug_id_path_is_encoded():
+    assert bug_url("https://example.com", "1/2").endswith("/rest/bug/1%2F2")
+
+
 def test_api_key_sent_as_header_not_url(bug_payload):
     captured: dict = {}
     fetch_bug("https://example.com", "40000", api_key="SECRET",
