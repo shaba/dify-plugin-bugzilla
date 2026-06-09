@@ -6,9 +6,9 @@ identity:
     ru_RU: "Bugzilla: детали бага"
 description:
   human:
-    en_US: Get an Bugzilla bug by id with status, product/component and key comments
+    en_US: Get a Bugzilla bug by id with status, product/component and key comments
     ru_RU: Получить баг Bugzilla по id со статусом, продуктом/компонентом и комментариями
-  llm: Get details of an Bugzilla bug by its numeric id, including status, resolution, product, component and the first comments. Use when a specific bug number is known.
+  llm: Get details of a Bugzilla bug by its numeric id, including status, resolution, product, component and the first comments. Use when a specific bug number is known.
 parameters:
   - name: bug_id
     type: string
