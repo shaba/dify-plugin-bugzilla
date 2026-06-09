@@ -4,6 +4,7 @@ from typing import Any
 from dify_plugin import Tool
 from dify_plugin.entities.tool import ToolInvokeMessage
 
+from bugzilla_client.errors import BugzillaSearchError
 from bugzilla_client.search import format_search, search_bugs
 
 
@@ -22,6 +23,9 @@ class BugSearchTool(Tool):
 
         try:
             bugs = search_bugs(base_url, query, limit=20, api_key=api_key)
+        except BugzillaSearchError as exc:
+            yield self.create_text_message(str(exc))
+            return
         except Exception as exc:  # noqa: BLE001
             yield self.create_text_message(f"Bugzilla request error: {exc}")
             return

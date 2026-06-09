@@ -3,6 +3,7 @@ from __future__ import annotations
 from typing import Any
 from urllib.parse import urlencode
 
+from .errors import BugzillaSearchError
 from .http import Fetch, api_key_headers, default_fetch
 
 _SEARCH_FIELDS = "id,summary,status,resolution,product,component,severity,last_change_time"
@@ -17,6 +18,8 @@ def search_bugs(base_url: str, query: str, *, limit: int = 20, api_key: str | No
                 fetch: Fetch = default_fetch, timeout: int = 30) -> list[dict[str, Any]]:
     payload = fetch(quicksearch_url(base_url, query, limit=limit), timeout,
                     headers=api_key_headers(api_key))
+    if isinstance(payload, dict) and payload.get("error"):
+        raise BugzillaSearchError(str(payload.get("message") or "Bugzilla rejected the search"))
     bugs = payload.get("bugs") if isinstance(payload, dict) else None
     return [b for b in (bugs or []) if isinstance(b, dict)]
 

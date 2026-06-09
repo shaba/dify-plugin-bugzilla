@@ -4,3 +4,7 @@ class BugzillaError(Exception):
 
 class BugNotFound(BugzillaError):
     pass
+
+
+class BugzillaSearchError(BugzillaError):
+    pass

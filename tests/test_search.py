@@ -1,3 +1,4 @@
+from bugzilla_client.errors import BugzillaSearchError
 from bugzilla_client.http import api_key_headers
 from bugzilla_client.search import format_search, quicksearch_url, search_bugs
 
@@ -32,6 +33,15 @@ def test_search_api_key_sent_as_header(search_payload):
                 fetch=_fetch(search_payload, captured))
     assert "SECRET" not in captured["url"]
     assert captured["headers"] == api_key_headers("SECRET")
+
+
+def test_search_bugs_error_raises():
+    payload = {"error": True, "message": "invalid api_key"}
+    try:
+        search_bugs("https://example.com", "x", fetch=_fetch(payload))
+    except BugzillaSearchError:
+        return
+    raise AssertionError("expected BugzillaSearchError for an error response")
 
 
 def test_format_search(search_payload):
