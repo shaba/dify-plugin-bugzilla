@@ -7,19 +7,33 @@ from bugzilla_client.bugs import (
     status_line,
 )
 from bugzilla_client.errors import BugNotFound
+from bugzilla_client.http import api_key_headers
 
 
-def _fetch(payload):
-    def f(url, timeout=30):
+def _fetch(payload, captured=None):
+    def f(url, timeout=30, *, headers=None):
+        if captured is not None:
+            captured["url"] = url
+            captured["headers"] = headers
         return payload
     return f
 
 
-def test_bug_url_and_api_key():
+def test_bug_urls_never_carry_secret():
+    # The api_key must travel in a header, never the URL.
     assert bug_url("https://example.com", "40000") == \
         "https://example.com/rest/bug/40000"
-    assert "api_key=secret" in bug_url("https://example.com", "40000", api_key="secret")
     assert comments_url("https://example.com", "40000").endswith("/rest/bug/40000/comment")
+    assert "api_key" not in bug_url("https://example.com", "40000")
+
+
+def test_api_key_sent_as_header_not_url(bug_payload):
+    captured: dict = {}
+    fetch_bug("https://example.com", "40000", api_key="SECRET",
+              fetch=_fetch(bug_payload, captured))
+    assert "SECRET" not in captured["url"]
+    assert captured["headers"] == api_key_headers("SECRET")
+    assert captured["headers"]["X-BUGZILLA-API-KEY"] == "SECRET"
 
 
 def test_fetch_bug_returns_first(bug_payload):

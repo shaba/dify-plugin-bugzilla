@@ -3,21 +3,20 @@ from __future__ import annotations
 from typing import Any
 from urllib.parse import urlencode
 
-from .http import Fetch, default_fetch
+from .http import Fetch, api_key_headers, default_fetch
 
 _SEARCH_FIELDS = "id,summary,status,resolution,product,component,severity,last_change_time"
 
 
-def quicksearch_url(base_url: str, query: str, *, limit: int = 20, api_key: str | None = None) -> str:
+def quicksearch_url(base_url: str, query: str, *, limit: int = 20) -> str:
     params: dict[str, Any] = {"quicksearch": query, "limit": limit, "include_fields": _SEARCH_FIELDS}
-    if api_key:
-        params["api_key"] = api_key
     return f"{base_url.rstrip('/')}/rest/bug?{urlencode(params)}"
 
 
 def search_bugs(base_url: str, query: str, *, limit: int = 20, api_key: str | None = None,
                 fetch: Fetch = default_fetch, timeout: int = 30) -> list[dict[str, Any]]:
-    payload = fetch(quicksearch_url(base_url, query, limit=limit, api_key=api_key), timeout)
+    payload = fetch(quicksearch_url(base_url, query, limit=limit), timeout,
+                    headers=api_key_headers(api_key))
     bugs = (payload or {}).get("bugs") or []
     return [b for b in bugs if isinstance(b, dict)]
 

@@ -1,37 +1,27 @@
 from __future__ import annotations
 
 from typing import Any
-from urllib.parse import quote, urlencode
+from urllib.parse import quote
 
 from .errors import BugNotFound
-from .http import Fetch, default_fetch
+from .http import Fetch, api_key_headers, default_fetch
 
 
 def bug_browser_url(base_url: str, bug_id: str) -> str:
     return f"{base_url.rstrip('/')}/show_bug.cgi?id={quote(str(bug_id))}"
 
 
-def _with_key(params: dict[str, Any], api_key: str | None) -> str:
-    if api_key:
-        params = {**params, "api_key": api_key}
-    return urlencode(params)
+def bug_url(base_url: str, bug_id: str) -> str:
+    return f"{base_url.rstrip('/')}/rest/bug/{quote(str(bug_id))}"
 
 
-def bug_url(base_url: str, bug_id: str, *, api_key: str | None = None) -> str:
-    q = _with_key({}, api_key)
-    base = f"{base_url.rstrip('/')}/rest/bug/{quote(str(bug_id))}"
-    return f"{base}?{q}" if q else base
-
-
-def comments_url(base_url: str, bug_id: str, *, api_key: str | None = None) -> str:
-    q = _with_key({}, api_key)
-    base = f"{base_url.rstrip('/')}/rest/bug/{quote(str(bug_id))}/comment"
-    return f"{base}?{q}" if q else base
+def comments_url(base_url: str, bug_id: str) -> str:
+    return f"{base_url.rstrip('/')}/rest/bug/{quote(str(bug_id))}/comment"
 
 
 def fetch_bug(base_url: str, bug_id: str, *, api_key: str | None = None,
               fetch: Fetch = default_fetch, timeout: int = 30) -> dict[str, Any]:
-    payload = fetch(bug_url(base_url, bug_id, api_key=api_key), timeout)
+    payload = fetch(bug_url(base_url, bug_id), timeout, headers=api_key_headers(api_key))
     if isinstance(payload, dict) and payload.get("error"):
         raise BugNotFound(str(payload.get("message") or f"Bug {bug_id} not found"))
     bugs = (payload or {}).get("bugs") or []
@@ -42,7 +32,7 @@ def fetch_bug(base_url: str, bug_id: str, *, api_key: str | None = None,
 
 def fetch_comments(base_url: str, bug_id: str, *, api_key: str | None = None,
                    fetch: Fetch = default_fetch, timeout: int = 30) -> list[dict[str, Any]]:
-    payload = fetch(comments_url(base_url, bug_id, api_key=api_key), timeout)
+    payload = fetch(comments_url(base_url, bug_id), timeout, headers=api_key_headers(api_key))
     bugs = (payload or {}).get("bugs") or {}
     entry = bugs.get(str(bug_id)) or {}
     comments = entry.get("comments") or []
