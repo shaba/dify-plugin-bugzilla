@@ -21,6 +21,20 @@ parameters:
       ru_RU: Запрос quicksearch (ключевые слова, пакет, компонент)
     llm_description: Bugzilla quicksearch query, e.g. a package name, component or keywords
     form: llm
+  - name: limit
+    type: number
+    required: false
+    default: 15
+    min: 1
+    max: 50
+    label:
+      en_US: Limit
+      ru_RU: Лимит
+    human_description:
+      en_US: Maximum number of results to return (1-50, default 15)
+      ru_RU: Максимальное число результатов (1-50, по умолчанию 15)
+    llm_description: Maximum number of bugs to return, between 1 and 50 (default 15)
+    form: llm
 extra:
   python:
     source: tools/bug_search.py

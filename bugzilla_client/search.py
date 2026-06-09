@@ -8,13 +8,15 @@ from .http import Fetch, api_key_headers, default_fetch
 
 _SEARCH_FIELDS = "id,summary,status,resolution,product,component,severity,last_change_time"
 
+DEFAULT_LIMIT = 15
 
-def quicksearch_url(base_url: str, query: str, *, limit: int = 20) -> str:
+
+def quicksearch_url(base_url: str, query: str, *, limit: int = DEFAULT_LIMIT) -> str:
     params: dict[str, Any] = {"quicksearch": query, "limit": limit, "include_fields": _SEARCH_FIELDS}
     return f"{base_url.rstrip('/')}/rest/bug?{urlencode(params)}"
 
 
-def search_bugs(base_url: str, query: str, *, limit: int = 20, api_key: str | None = None,
+def search_bugs(base_url: str, query: str, *, limit: int = DEFAULT_LIMIT, api_key: str | None = None,
                 fetch: Fetch = default_fetch, timeout: int = 30) -> list[dict[str, Any]]:
     payload = fetch(quicksearch_url(base_url, query, limit=limit), timeout,
                     headers=api_key_headers(api_key))
@@ -24,12 +26,11 @@ def search_bugs(base_url: str, query: str, *, limit: int = 20, api_key: str | No
     return [b for b in (bugs or []) if isinstance(b, dict)]
 
 
-def format_search(bugs: list[dict[str, Any]], query: str, *, limit: int = 15) -> str:
+def format_search(bugs: list[dict[str, Any]], query: str) -> str:
     if not bugs:
         return f"No bugs found for \"{query}\"."
-    shown = bugs[:limit]
-    lines = [f"Found {len(bugs)} bug(s) for \"{query}\" (showing {len(shown)}):"]
-    for bug in shown:
+    lines = [f"Showing {len(bugs)} bug(s) for \"{query}\":"]
+    for bug in bugs:
         bug_id = bug.get("id")
         status = str(bug.get("status") or "").strip()
         resolution = str(bug.get("resolution") or "").strip()

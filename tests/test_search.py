@@ -46,8 +46,16 @@ def test_search_bugs_error_raises():
 
 def test_format_search(search_payload):
     text = format_search(search_payload["bugs"], "logrotate")
-    assert text.startswith("Found")
+    assert text.startswith("Showing")
     assert "- " in text
+
+
+def test_format_search_shows_all_fetched():
+    bugs = [{"id": i, "status": "NEW", "summary": f"s{i}"} for i in range(20)]
+    text = format_search(bugs, "q")
+    # Every fetched bug must appear; no silent truncation, header reflects the real count.
+    assert text.startswith("Showing 20 bug(s)")
+    assert text.count("\n- ") == 20
 
 
 def test_format_search_empty():

@@ -25,7 +25,7 @@ Search bugs via Bugzilla quicksearch (`/rest/bug?quicksearch=...`): id, status, 
 product and component.
 
 - `query` (string, required) — quicksearch query.
-- `limit` (number, optional, default 5) — number of results.
+- `limit` (number, optional, default 15, range 1–50) — maximum number of results to return.
 
 ## Development
 
