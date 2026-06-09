@@ -4,6 +4,8 @@ from typing import Any, Callable
 
 import requests
 
+USER_AGENT = "dify-plugin-bugzilla/0.1.0"
+
 Fetch = Callable[..., Any]
 
 
@@ -44,7 +46,10 @@ def check_bugzilla(base_url: str, *, api_key: str | None = None,
 
 
 def default_fetch(url: str, timeout: int = 30, *, headers: dict[str, str] | None = None) -> Any:
-    response = requests.get(url, timeout=timeout, headers=headers)
+    request_headers = {"User-Agent": USER_AGENT}
+    if headers:
+        request_headers.update(headers)
+    response = requests.get(url, timeout=timeout, headers=request_headers)
     # Modern Bugzilla (5.x, BMO) signals API errors with a real 4xx status AND a JSON
     # body {"error": true, "code": .., "message": ..}. Hand that body to the domain layer
     # so it can raise a friendly BugNotFound/BugzillaSearchError instead of a raw HTTPError.
