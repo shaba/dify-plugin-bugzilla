@@ -95,7 +95,8 @@ def format_bug(bug: dict[str, Any], comments: list[dict[str, Any]], base_url: st
             who = str(comment.get("creator") or "").strip()
             when = str(comment.get("creation_time") or comment.get("time") or "")[:10]
             text = _first_lines(comment.get("text") or "", comment_lines)
-            lines.append(f"#{num} {who} {when}:")
+            marker = f"#{num} " if num is not None else ""
+            lines.append(f"{marker}{who} {when}:")
             if text:
                 lines.append(text)
     return "\n".join(line for line in lines).strip()

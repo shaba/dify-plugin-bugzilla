@@ -80,6 +80,13 @@ def test_fetch_comments_fallback_single_entry():
     assert comments and comments[0]["text"] == "hi"
 
 
+def test_format_bug_handles_missing_count():
+    bug = {"id": 1, "status": "NEW", "summary": "x"}
+    comments = [{"creator": "a@b", "creation_time": "2021-01-01", "text": "hi"}]
+    text = format_bug(bug, comments, "https://example.com")
+    assert "#None" not in text
+
+
 def test_format_bug_compact(bug_payload, comments_payload):
     bug = bug_payload["bugs"][0]
     comments = comments_payload["bugs"]["40000"]["comments"]
