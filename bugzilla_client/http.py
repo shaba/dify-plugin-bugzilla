@@ -4,7 +4,7 @@ from typing import Any, Callable
 
 import requests
 
-USER_AGENT = "dify-plugin-bugzilla/0.1.0"
+USER_AGENT = "dify-plugin-bugzilla/0.1.1"
 
 Fetch = Callable[..., Any]
 

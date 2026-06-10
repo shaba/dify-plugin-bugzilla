@@ -1,6 +1,6 @@
 [project]
 name = "dify-plugin-bugzilla"
-version = "0.1.0"
+version = "0.1.1"
 description = "Read bugs, statuses and comments from any Bugzilla instance"
 readme = "README.md"
 requires-python = ">=3.12"

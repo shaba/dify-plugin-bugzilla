@@ -1,1 +1,9 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 48 48"><rect width="48" height="48" rx="8" fill="#552a8b"/><text x="24" y="31" font-family="sans-serif" font-size="13" fill="#fff" text-anchor="middle">BZ</text></svg>
+<svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 48 48">
+ <defs><linearGradient id="bg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f87171"/><stop offset="1" stop-color="#991b1b"/></linearGradient></defs>
+ <rect width="48" height="48" rx="10" fill="url(#bg)"/>
+ <g stroke="#fff" stroke-width="2.2" stroke-linecap="round"><path d="M20 11l2.5 3M28 11l-2.5 3M12 22h5M31 22h5M11 29h6M31 29h6M12 36h6M30 36h6"/></g>
+ <ellipse cx="24" cy="27" rx="8" ry="11" fill="#fff"/>
+ <circle cx="24" cy="15.5" r="4" fill="#fff"/>
+ <line x1="24" y1="18" x2="24" y2="37" stroke="#991b1b" stroke-width="1.6"/>
+ <circle cx="22" cy="14.5" r="0.9" fill="#991b1b"/><circle cx="26" cy="14.5" r="0.9" fill="#991b1b"/>
+</svg>
